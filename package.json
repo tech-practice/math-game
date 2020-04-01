@@ -1,0 +1,10 @@
+{
+  "name": "math-game",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "node game"
+  },
+  "author": "Samol Seng",
+  "license": "ISC"
+}
