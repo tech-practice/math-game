@@ -5,6 +5,8 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
+const question = text => new Promise(resolve => rl.question(text, input => resolve(input)))
+
 const SUCCESS = ['Excellent', 'Wonderful', 'Very Good', 'Superb', 'Outstanding', 'Magnificient', 'Marvelous', 'Perfect', 'Terrific', 'fantastic', 'Awesome', 'Brilliant']
 const state = {
   success: 0,
@@ -13,24 +15,30 @@ const state = {
   limit: 0
 }
 
-const start = () => {
+const start = async () => {
   const { limit } = state
   console.log()
   const a = getRandomInt(limit || null)
   const b = getRandomInt(limit || null)
   const { answer, text} = getAnswer(a, b)
-  rl.question(`${text} = `, input => {
-    if (parseInt(input) !== answer) {
-      console.log('  Sorry, the answer is:', answer)
+  let input = await question(`${text} = `)
+  while (parseInt(input) !== answer) {
+    if (input === 's') {
+      console.log('  Sorry, correct answer is ', answer)
       state.failure++
-    } else {
-      const success = SUCCESS[getRandomInt(SUCCESS.length)]
-      console.log(`  ${success}!!!!`)
-      state.success++
+      break
     }
-    if (state.total > state.success + state.failure) start()
-    else printSummary()
-  })
+    console.log('  Sorry, incorrect answer. Try again!')
+    input = await question(`${text} = `)
+  }
+  // if not skip
+  if (input && input !== 's') {
+    const success = SUCCESS[getRandomInt(SUCCESS.length)]
+    console.log(`  ${success}!!!!`)
+    state.success++
+  }
+  if (state.total > state.success + state. failure) await start()
+  else printSummary()
 }
 
 const getRandomInt = (max = 100, min = 1) => {
@@ -68,10 +76,10 @@ const main = () => {
   console.log('#########################')
 
   const [limit, total] = process.argv.slice(2)
-  state.limit = limit || 50
-  state.total = total || 20
+  state.limit = Number(limit) || 50
+  state.total = Number(total) || 20
 
-  start()
+  return start()
 }
 
 // ###########################
